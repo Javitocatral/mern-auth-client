@@ -1,28 +1,47 @@
-import { useState } from "react";
+import axios from 'axios'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Signup() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [userName, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleEmailChange = (e) => setEmail(e.target.value);
-  const handleUsernameChange = (e) => setUsername(e.target.value);
-  const handlePasswordChange = (e) => setPassword(e.target.value);
+  const handleEmailChange = (e) => setEmail(e.target.value)
+  const handleUsernameChange = (e) => setUsername(e.target.value)
+  const handlePasswordChange = (e) => setPassword(e.target.value)
 
   const handleSignup = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+
+    try {
+      const newUser = {
+        email,
+        userName,
+        password,
+      }
+      await axios.post('http://localhost:5005/api/auth/signup', newUser)
+
+      navigate('/login')
+    } catch (error) {
+      console.log(error)
+      if (error.response.status === 400) {
+        setErrorMessage(error.response.data.message)
+      } else {
+        //pagian generica de error
+      }
+    }
 
     // ... contactar al backend para registrar al usuario aqui
-  };
+  }
 
   return (
     <div>
-
       <h1>Formulario de Registro</h1>
-    
-      <form onSubmit={handleSignup}>
 
+      <form onSubmit={handleSignup}>
         <label>Correo Electronico:</label>
         <input
           type="email"
@@ -37,7 +56,7 @@ function Signup() {
         <input
           type="text"
           name="username"
-          value={username}
+          value={userName}
           onChange={handleUsernameChange}
         />
 
@@ -54,10 +73,10 @@ function Signup() {
         <br />
 
         <button type="submit">Registrar</button>
+        {errorMessage && <h5 style={{ color: 'red' }}>{errorMessage}</h5>}
       </form>
-      
     </div>
-  );
+  )
 }
 
-export default Signup;
+export default Signup

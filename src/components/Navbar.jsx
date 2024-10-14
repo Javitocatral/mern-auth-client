@@ -1,16 +1,28 @@
-import { Link } from "react-router-dom";
+import { useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { AuthContext } from '../context/auth.context'
 
 function Navbar() {
-
+  const navigate = useNavigate()
+  const { isLoggeIn, authenticateUser } = useContext(AuthContext)
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem('authToken')
+      await authenticateUser()
+      navigate('/')
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <nav>
       <Link to="/">Home</Link>
-      <Link to="/signup">Registro</Link>
-      <Link to="/login">Acceso</Link>
-      <Link to="/private-page-example">Ejemplo Privado</Link>
-      <Link>Cerrar sesión</Link>
+      {!isLoggeIn && <Link to="/signup">Registro</Link>}
+      {!isLoggeIn && <Link to="/login">Acceso</Link>}
+      {isLoggeIn && <Link to="/private-page-example">Ejemplo Privado</Link>}
+      {isLoggeIn && <Link onClick={handleLogout}>Cerrar sesión</Link>}
     </nav>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar
